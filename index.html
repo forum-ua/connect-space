@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Спільна дошка</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="./"><span class="logo">Д</span><span><b>Дошка</b><small>спільний простір</small></span></a>
+      <div class="label">РОЗДІЛИ</div>
+      <button class="nav active" id="allBtn">▤　Усі гілки <span id="threadTotal">0</span></button>
+      <div class="side-status"><i></i> Спільний онлайн-простір</div>
+      <p class="side-foot">Усі учасники бачать однакові гілки та публікації.</p>
+    </aside>
+    <main>
+      <header><div class="mobile-brand">ДОШКА <span>/ СПІЛЬНОТА</span></div><div class="status"><i></i><span id="connection">Підключення...</span></div></header>
+      <section class="hero">
+        <div><div class="eyebrow">ЄДИНИЙ ІНФОРМАЦІЙНИЙ ПРОСТІР</div><h1>Спільна дошка</h1><p>Створюйте гілки, діліться текстом і фотографіями. Усе в одному місці.</p></div>
+        <button class="primary" id="newThread">＋ Створити гілку</button>
+      </section>
+      <section class="workspace">
+        <div class="threads-area">
+          <div class="section-head"><div><h2>Гілки</h2><p>Оберіть розділ для перегляду</p></div><small id="threadCount">0 гілок</small></div>
+          <div id="threadList" class="thread-list"><div class="hint">Завантаження гілок...</div></div>
+        </div>
+        <div class="detail">
+          <div id="empty" class="empty"><div class="spark">✦</div><h2>Спільний простір для інформації</h2><p>Створіть першу гілку або виберіть наявну зліва.</p><button class="primary" id="emptyNew">Створити першу гілку</button></div>
+          <div id="threadPanel" class="hidden">
+            <div class="thread-title"><div><div class="eyebrow">ВИБРАНА ГІЛКА</div><h2 id="activeTitle"></h2><p id="activeDate"></p></div></div>
+            <form id="postForm" class="composer">
+              <textarea id="postText" maxlength="5000" placeholder="Напишіть щось для цієї гілки..."></textarea>
+              <div id="previewWrap" class="preview hidden"><img id="preview" alt="Попередній перегляд"><button type="button" id="removePhoto">Прибрати фото</button></div>
+              <div class="compose-bottom"><div class="attach"><label for="photo">＋ Додати фото</label><input id="photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><small id="fileLabel">JPG, PNG, WEBP або GIF · до 8 МБ</small></div><button class="primary" id="publish" type="submit">Опублікувати ↗</button></div>
+            </form>
+            <div class="posts-head"><h3>Публікації</h3><span id="postCount">0</span></div>
+            <div id="posts" class="posts"></div>
+          </div>
+        </div>
+      </section>
+      <footer>Спільна дошка <span>•</span> Хмарне збереження увімкнено</footer>
+    </main>
+  </div>
+  <div class="modal hidden" id="modal"><form id="threadForm" class="dialog"><button type="button" class="close" id="closeModal">×</button><div class="eyebrow">НОВИЙ РОЗДІЛ</div><h2>Створити гілку</h2><p>Назва буде доступна всім користувачам сайту.</p><label for="titleInput">Назва гілки</label><input id="titleInput" maxlength="80" placeholder="Наприклад, Інформація" required><button class="primary full" type="submit">Створити гілку</button></form></div>
+  <div class="toast" id="toast"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
