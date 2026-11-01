@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="uk">
 <head>
@@ -8,46 +9,338 @@
   <link rel="stylesheet" href="./style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./config.js"></script>
+
+  <style>
+    /* Новорічний таймер */
+    header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .newyear-timer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 16px;
+      border: 1px solid rgba(139, 92, 246, .35);
+      border-radius: 14px;
+      background: linear-gradient(120deg, #111b35, #211342);
+      box-shadow: 0 0 20px rgba(124, 58, 237, .18);
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    .timer-title {
+      color: #c4b5fd;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 3px;
+    }
+
+    .timer-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 32px;
+    }
+
+    .timer-number {
+      color: #fff;
+      font-size: 19px;
+      line-height: 1.1;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-label {
+      color: #a5b4fc;
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+
+    .timer-separator {
+      color: #8b5cf6;
+      font-weight: bold;
+      margin-top: -8px;
+    }
+
+    /* Сніг */
+    #snowfall {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .snowflake {
+      position: absolute;
+      top: -25px;
+      color: #fff;
+      opacity: .8;
+      user-select: none;
+      text-shadow: 0 0 8px #a5b4fc;
+      animation: snow-fall linear infinite;
+    }
+
+    @keyframes snow-fall {
+      0% {
+        transform: translate3d(0, -10px, 0) rotate(0deg);
+      }
+      100% {
+        transform: translate3d(45px, 110vh, 0) rotate(360deg);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .newyear-timer {
+        position: static;
+        transform: none;
+        margin: 8px auto;
+        padding: 7px 9px;
+        gap: 5px;
+        order: 3;
+      }
+
+      header {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .timer-title {
+        font-size: 10px;
+      }
+
+      .timer-number {
+        font-size: 16px;
+      }
+
+      .timer-unit {
+        min-width: 27px;
+      }
+
+      .timer-label {
+        font-size: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .snowflake {
+        animation: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
+
+  <!-- Сніг -->
+  <div id="snowfall" aria-hidden="true"></div>
+
   <div class="layout">
     <aside class="sidebar">
-      <a class="brand" href="./"><span class="logo">Д</span><span><b>Дошка</b><small>спільний простір</small></span></a>
+      <a class="brand" href="./">
+        <span class="logo">Д</span>
+        <span><b>Дошка</b><small>спільний простір</small></span>
+      </a>
+
       <div class="label">РОЗДІЛИ</div>
-      <button class="nav active" id="allBtn">▤　Усі гілки <span id="threadTotal">0</span></button>
+
+      <button class="nav active" id="allBtn">
+        ▤　Усі гілки <span id="threadTotal">0</span>
+      </button>
+
       <div class="side-status"><i></i> Спільний онлайн-простір</div>
       <p class="side-foot">Усі учасники бачать однакові гілки та публікації.</p>
     </aside>
+
     <main>
-      <header><div class="mobile-brand">ДОШКА <span>/ СПІЛЬНОТА</span></div><div class="status"><i></i><span id="connection">Підключення...</span></div></header>
+      <header>
+        <div class="mobile-brand">ДОШКА <span>/ СПІЛЬНОТА</span></div>
+
+        <!-- Таймер по центру зверху -->
+        <div class="newyear-timer">
+          <span class="timer-title">🎄 ДО НОВОГО РОКУ</span>
+
+          <div class="timer-unit">
+            <span class="timer-number" id="nyDays">000</span>
+            <span class="timer-label">Днів</span>
+          </div>
+
+          <span class="timer-separator">:</span>
+
+          <div class="timer-unit">
+            <span class="timer-number" id="nyHours">00</span>
+            <span class="timer-label">Год</span>
+          </div>
+
+          <span class="timer-separator">:</span>
+
+          <div class="timer-unit">
+            <span class="timer-number" id="nyMinutes">00</span>
+            <span class="timer-label">Хв</span>
+          </div>
+
+          <span class="timer-separator">:</span>
+
+          <div class="timer-unit">
+            <span class="timer-number" id="nySeconds">00</span>
+            <span class="timer-label">Сек</span>
+          </div>
+        </div>
+
+        <div class="status">
+          <i></i><span id="connection">Підключення...</span>
+        </div>
+      </header>
+
       <section class="hero">
-        <div><div class="eyebrow">ЄДИНИЙ ІНФОРМАЦІЙНИЙ ПРОСТІР</div><h1>Спільна дошка</h1><p>Створюйте гілки, діліться текстом і фотографіями. Усе в одному місці.</p></div>
+        <div>
+          <div class="eyebrow">ЄДИНИЙ ІНФОРМАЦІЙНИЙ ПРОСТІР</div>
+          <h1>Спільна дошка</h1>
+          <p>Створюйте гілки, діліться текстом і фотографіями. Усе в одному місці.</p>
+        </div>
         <button class="primary" id="newThread">＋ Створити гілку</button>
       </section>
+
       <section class="workspace">
         <div class="threads-area">
-          <div class="section-head"><div><h2>Гілки</h2><p>Оберіть розділ для перегляду</p></div><small id="threadCount">0 гілок</small></div>
-          <div id="threadList" class="thread-list"><div class="hint">Завантаження гілок...</div></div>
+          <div class="section-head">
+            <div>
+              <h2>Гілки</h2>
+              <p>Оберіть розділ для перегляду</p>
+            </div>
+            <small id="threadCount">0 гілок</small>
+          </div>
+
+          <div id="threadList" class="thread-list">
+            <div class="hint">Завантаження гілок...</div>
+          </div>
         </div>
+
         <div class="detail">
-          <div id="empty" class="empty"><div class="spark">✦</div><h2>Спільний простір для інформації</h2><p>Створіть першу гілку або виберіть наявну зліва.</p><button class="primary" id="emptyNew">Створити першу гілку</button></div>
+          <div id="empty" class="empty">
+            <div class="spark">✦</div>
+            <h2>Спільний простір для інформації</h2>
+            <p>Створіть першу гілку або виберіть наявну зліва.</p>
+            <button class="primary" id="emptyNew">Створити першу гілку</button>
+          </div>
+
           <div id="threadPanel" class="hidden">
-            <div class="thread-title"><div><div class="eyebrow">ВИБРАНА ГІЛКА</div><h2 id="activeTitle"></h2><p id="activeDate"></p></div></div>
+            <div class="thread-title">
+              <div>
+                <div class="eyebrow">ВИБРАНА ГІЛКА</div>
+                <h2 id="activeTitle"></h2>
+                <p id="activeDate"></p>
+              </div>
+            </div>
+
             <form id="postForm" class="composer">
               <textarea id="postText" maxlength="5000" placeholder="Напишіть щось для цієї гілки..."></textarea>
-              <div id="previewWrap" class="preview hidden"><img id="preview" alt="Попередній перегляд"><button type="button" id="removePhoto">Прибрати фото</button></div>
-              <div class="compose-bottom"><div class="attach"><label for="photo">＋ Додати фото</label><input id="photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><small id="fileLabel">JPG, PNG, WEBP або GIF · до 8 МБ</small></div><button class="primary" id="publish" type="submit">Опублікувати ↗</button></div>
+
+              <div id="previewWrap" class="preview hidden">
+                <img id="preview" alt="Попередній перегляд">
+                <button type="button" id="removePhoto">Прибрати фото</button>
+              </div>
+
+              <div class="compose-bottom">
+                <div class="attach">
+                  <label for="photo">＋ Додати фото</label>
+                  <input id="photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                  <small id="fileLabel">JPG, PNG, WEBP або GIF · до 8 МБ</small>
+                </div>
+                <button class="primary" id="publish" type="submit">Опублікувати ↗</button>
+              </div>
             </form>
-            <div class="posts-head"><h3>Публікації</h3><span id="postCount">0</span></div>
+
+            <div class="posts-head">
+              <h3>Публікації</h3>
+              <span id="postCount">0</span>
+            </div>
             <div id="posts" class="posts"></div>
           </div>
         </div>
       </section>
+
       <footer>Спільна дошка <span>•</span> Хмарне збереження увімкнено</footer>
     </main>
   </div>
-  <div class="modal hidden" id="modal"><form id="threadForm" class="dialog"><button type="button" class="close" id="closeModal">×</button><div class="eyebrow">НОВИЙ РОЗДІЛ</div><h2>Створити гілку</h2><p>Назва буде доступна всім користувачам сайту.</p><label for="titleInput">Назва гілки</label><input id="titleInput" maxlength="80" placeholder="Наприклад, Інформація" required><button class="primary full" type="submit">Створити гілку</button></form></div>
+
+  <div class="modal hidden" id="modal">
+    <form id="threadForm" class="dialog">
+      <button type="button" class="close" id="closeModal">×</button>
+      <div class="eyebrow">НОВИЙ РОЗДІЛ</div>
+      <h2>Створити гілку</h2>
+      <p>Назва буде доступна всім користувачам сайту.</p>
+      <label for="titleInput">Назва гілки</label>
+      <input id="titleInput" maxlength="80" placeholder="Наприклад, Інформація" required>
+      <button class="primary full" type="submit">Створити гілку</button>
+    </form>
+  </div>
+
   <div class="toast" id="toast"></div>
+
+  <!-- Новорічні ефекти -->
+  <script>
+    // Таймер до Нового 2027 року за київським часом
+    const newYearDate = new Date("2027-01-01T00:00:00+03:00").getTime();
+
+    function updateNewYearTimer() {
+      const now = Date.now();
+      let difference = Math.max(0, newYearDate - now);
+
+      const days = Math.floor(difference / 86400000);
+      difference %= 86400000;
+
+      const hours = Math.floor(difference / 3600000);
+      difference %= 3600000;
+
+      const minutes = Math.floor(difference / 60000);
+      const seconds = Math.floor((difference % 60000) / 1000);
+
+      document.getElementById("nyDays").textContent =
+        String(days).padStart(3, "0");
+
+      document.getElementById("nyHours").textContent =
+        String(hours).padStart(2, "0");
+
+      document.getElementById("nyMinutes").textContent =
+        String(minutes).padStart(2, "0");
+
+      document.getElementById("nySeconds").textContent =
+        String(seconds).padStart(2, "0");
+    }
+
+    updateNewYearTimer();
+    setInterval(updateNewYearTimer, 1000);
+
+    // Створення сніжинок
+    const snowContainer = document.getElementById("snowfall");
+
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      for (let i = 0; i < 45; i++) {
+        const snowflake = document.createElement("span");
+
+        snowflake.className = "snowflake";
+        snowflake.textContent = Math.random() > 0.5 ? "❄" : "❅";
+
+        snowflake.style.left = Math.random() * 100 + "%";
+        snowflake.style.fontSize = (10 + Math.random() * 13) + "px";
+        snowflake.style.animationDuration = (8 + Math.random() * 14) + "s";
+        snowflake.style.animationDelay = (-Math.random() * 20) + "s";
+        snowflake.style.opacity = 0.3 + Math.random() * 0.6;
+
+        snowContainer.appendChild(snowflake);
+      }
+    }
+  </script>
+
   <script src="./app.js"></script>
 </body>
 </html>
